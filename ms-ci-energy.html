@@ -2,112 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CI reagent gas energy comparison (CHM4130 PS6, Problems 19, 20, 25)</title>
-<style>
-:root{--ink:#1f2d3a;--navy:#163e63;--steel:#326b9e;--muted:#566676;--rule:#cfdbe6;--panel:#f1f5f9;--bg:#ffffff;--soft:#5d8fbd;--hard:#b23a48;color-scheme:light}
-@media (prefers-color-scheme:dark){:root{--ink:#e3eaf1;--navy:#a9cdf0;--steel:#7fb0dc;--muted:#9fb0c0;--rule:#34475a;--panel:#17232f;--bg:#0f1820;--soft:#6fa3d4;--hard:#f0828f;color-scheme:dark}}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Arial,Helvetica,sans-serif}
-main{max-width:900px;margin:0 auto;padding:22px 18px 34px}
-h1{font-size:1.45rem;color:var(--navy);margin:0 0 2px}
-.src{margin:0 0 14px;color:var(--muted);font-size:.9rem}
-.lede{margin:0 0 10px;max-width:72ch}
-.controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin:10px 0}
-.controls label{font-size:.95rem;min-width:15.5em}
-input[type=range]{width:min(300px,100%);accent-color:var(--steel)}
-output{font-weight:700;font-variant-numeric:tabular-nums;min-width:6.5em}
-button{font:inherit;font-size:.9rem;padding:5px 11px;border:1px solid var(--steel);border-radius:4px;background:transparent;color:var(--navy);cursor:pointer}
-button:hover{background:var(--panel)}
-:focus-visible{outline:2px solid var(--steel);outline-offset:2px}
-.chart{overflow-x:auto}
-.chart svg{min-width:620px}
-svg{display:block;width:100%;height:auto}
-.ax{stroke:var(--muted);stroke-width:1}
-.tk{fill:var(--muted);font-size:12px}
-.name{fill:var(--ink);font-size:14px}
-.sub{fill:var(--muted);font-size:12px}
-.note{font-size:.9rem;color:var(--muted);max-width:74ch}
-</style>
+<meta http-equiv="refresh" content="0; url=./">
+<link rel="canonical" href="./">
+<title>Opening the tool…</title>
 </head>
 <body>
-<main>
-<h1>CI reagent gas energy comparison</h1>
-<p class="src">CHM4130 Practice Problem Set 6, Problems 19, 20, and 25</p>
-<p class="lede">The energy left in the analyte ion depends on the reagent gas. For proton transfer it is PA(analyte) − PA(reagent gas); for charge exchange it is RE − IP(analyte). Set the analyte’s values and compare all five reagent ions at once.</p>
-
-<div class="controls">
-  <label for="pa">Analyte proton affinity (kJ/mol)</label>
-  <input type="range" id="pa" min="600" max="950" step="0.1" value="867">
-  <output id="paout" for="pa">867.0</output>
-</div>
-<div class="controls">
-  <label for="ip">Analyte ionization potential (eV)</label>
-  <input type="range" id="ip" min="7" max="13" step="0.01" value="9">
-  <output id="ipout" for="ip">9.00</output>
-</div>
-<div class="controls">
-  <button type="button" data-pa="776.4">Ethanol, PA 776.4 (Problem 19)</button>
-  <button type="button" data-pa="867">2,3-Dihydrofuran, PA 867 (Problem 20)</button>
-  <button type="button" data-ip="9">Analyte with IP 9 eV (Problem 25)</button>
-</div>
-
-<div class="chart"><svg id="plot" viewBox="0 0 860 360" role="img" aria-label="Bar chart of excess energy deposited by each reagent ion"></svg></div>
-<p class="note">Reagent data: PA(H₂) = 422.3, PA(CH₄) = 543.5, PA(isobutene, which gives t-C₄H₉⁺) = 802.1, PA(NH₃) = 853.6 kJ/mol; RE(Ar⁺•) = 15.76 eV; 1 eV = 96.485 kJ/mol. The 350 kJ/mol line is a typical C–O bond energy (Problem 20). This is a simplification: the energy spreads over the whole ion, so crossing the line makes fragmentation likely rather than certain.</p>
-</main>
-
-<script>
-(function(){
-  var NS='http://www.w3.org/2000/svg',EV=96.485,BOND=350,MAXE=900;
-  function el(tag,attrs,text){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;return e;}
-  var R=[
-    {name:'H₃⁺',gas:'from hydrogen, PA(H₂) = 422.3',pa:422.3},
-    {name:'CH₅⁺',gas:'from methane, PA(CH₄) = 543.5',pa:543.5},
-    {name:'t-C₄H₉⁺',gas:'from isobutane, PA(isobutene) = 802.1',pa:802.1},
-    {name:'NH₄⁺',gas:'from ammonia, PA(NH₃) = 853.6',pa:853.6},
-    {name:'Ar⁺•',gas:'charge exchange, RE = 15.76 eV',re:15.76}
-  ];
-  var pa=document.getElementById('pa'),ip=document.getElementById('ip'),svg=document.getElementById('plot');
-  var W=860,H=360,LX=250,RX=W-30,TOP=48,ROW=58;
-  function X(e){return LX+Math.min(e,MAXE)/MAXE*(RX-LX);}
-  function draw(){
-    var PA=+pa.value,IP=+ip.value;
-    document.getElementById('paout').textContent=PA.toFixed(1);
-    document.getElementById('ipout').textContent=IP.toFixed(2);
-    while(svg.firstChild)svg.removeChild(svg.firstChild);
-    var bottom=TOP+ROW*R.length;
-    for(var t=0;t<=MAXE;t+=150){
-      svg.appendChild(el('line',{x1:X(t),y1:bottom,x2:X(t),y2:bottom+5,'class':'ax'}));
-      svg.appendChild(el('text',{x:X(t),y:bottom+20,'text-anchor':'middle','class':'tk'},String(t)));
-    }
-    svg.appendChild(el('line',{x1:LX,y1:bottom,x2:RX,y2:bottom,'class':'ax'}));
-    svg.appendChild(el('text',{x:(LX+RX)/2,y:bottom+40,'text-anchor':'middle','class':'tk'},'Excess energy deposited in the analyte ion (kJ/mol)'));
-    svg.appendChild(el('line',{x1:X(BOND),y1:TOP-26,x2:X(BOND),y2:bottom,stroke:'var(--hard)','stroke-width':1.5,'stroke-dasharray':'5 4'}));
-    svg.appendChild(el('text',{x:X(BOND)+6,y:TOP-14,fill:'var(--hard)','font-size':12},'typical C–O bond, 350 kJ/mol'));
-    R.forEach(function(r,i){
-      var y=TOP+ROW*i,mid=y+ROW/2;
-      var e,eEV=null;
-      if(r.pa!=null){e=PA-r.pa;}else{eEV=r.re-IP;e=eEV*EV;}
-      svg.appendChild(el('text',{x:16,y:mid-2,'class':'name'},r.name));
-      svg.appendChild(el('text',{x:16,y:mid+15,'class':'sub'},r.gas));
-      if(e<=0){
-        var why=r.pa!=null?'No proton transfer: endothermic by '+Math.round(-e)+' kJ/mol':'No charge exchange: RE is below the analyte IP';
-        var wt=el('text',{x:LX+6,y:mid+5,fill:'var(--muted)','font-size':13},why);wt.setAttribute('style','paint-order:stroke;stroke:var(--bg);stroke-width:5px;stroke-linejoin:round');svg.appendChild(wt);
-        return;
-      }
-      var above=e>BOND;
-      svg.appendChild(el('rect',{x:LX,y:mid-11,width:Math.max(2,X(e)-LX),height:22,fill:above?'var(--hard)':'var(--soft)'}));
-      var label=Math.round(e)+' kJ/mol'+(eEV!=null?' ('+eEV.toFixed(2)+' eV)':'')+(above?', above the C–O bond energy':', below the C–O bond energy');
-      var lx=X(e)+8,anchor='start';
-      if(lx>RX-250){lx=X(e)-8;anchor='end';}
-      var tx=el('text',{x:lx,y:mid+5,'text-anchor':anchor,'font-size':13,'font-weight':'bold',fill:anchor==='end'?'var(--bg)':'var(--ink)'},label);if(anchor!=='end'){tx.setAttribute('style','paint-order:stroke;stroke:var(--bg);stroke-width:5px;stroke-linejoin:round');}svg.appendChild(tx);
-    });
-  }
-  pa.addEventListener('input',draw);ip.addEventListener('input',draw);
-  document.querySelectorAll('button[data-pa]').forEach(function(b){b.addEventListener('click',function(){pa.value=b.getAttribute('data-pa');draw();});});
-  document.querySelectorAll('button[data-ip]').forEach(function(b){b.addEventListener('click',function(){ip.value=b.getAttribute('data-ip');draw();});});
-  draw();
-})();
-</script>
+<p>Opening the tool… If nothing happens, <a href="./">click here</a>.</p>
 </body>
 </html>
